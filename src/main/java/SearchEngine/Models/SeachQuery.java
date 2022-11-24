@@ -1,4 +1,4 @@
-package me.laeub.springsearch.models;
+package SearchEngine.Models;
 
 public class SeachQuery {
 

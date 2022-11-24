@@ -49,7 +49,7 @@ public class Driver {
         String[] cont = wetReader.readLines(WET_FILE_PATH);
         WARCModel[] models_eur = wetReader.toEurModelArray(cont);
         performanceTimer.stop("loadWarcModels");
-        logger.info("Number of total models: " + models_eur.length);
+        logger.info("Number of total Models: " + models_eur.length);
 
         // We have to split our model-array to avoid OutOfMemoryError when creating Matrix
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));

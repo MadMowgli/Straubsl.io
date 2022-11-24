@@ -1,6 +1,6 @@
-package me.laeub.springsearch.controllers;
+package SearchEngine.Controllers;
 
-import me.laeub.springsearch.models.SeachQuery;
+import SearchEngine.Models.SeachQuery;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

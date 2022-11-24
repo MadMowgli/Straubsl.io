@@ -1,9 +1,8 @@
-package me.laeub.springsearch;
+package SearchEngine;
 
 import Jama.Matrix;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.TermSet;
-import PreProcessor.Models.WETReader;
 import Util.LogFormatter;
 import Util.MatrixManager;
 import Util.PerformanceTimer;
