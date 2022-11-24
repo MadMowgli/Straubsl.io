@@ -1,0 +1,15 @@
+body {
+    background-color: #DEB6AB;
+}
+
+.backdrop {
+    margin-top: -2rem;
+}
+
+.w-35 {
+    width: 35%;
+}
+.logo {
+    width: 15%;
+    height: 15%
+}

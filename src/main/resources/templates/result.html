@@ -1,0 +1,42 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SpringSearch</title>
+    <link href="/bootstrap.min.css" rel="stylesheet">
+    <link href="/custom.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+  <div class="row my-5 sticky-top">
+    <nav class="navbar navbar-light sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img src="/PngItem_2528255.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+          Straubsl.io
+        </a>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+  </div>
+  <div class="row">
+    <div class="col-9">
+      <p class="text-center" th:text="${query.getQueryString()}"></p>
+    </div>
+    <div class="col-3">
+      <p class="text-center" th:text="${query.getQueryString()}"></p>
+    </div>
+  </div>
+</div>
+<script src="/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
