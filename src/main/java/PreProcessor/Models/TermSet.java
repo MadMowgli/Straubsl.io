@@ -52,6 +52,10 @@ public class TermSet {
         return this.termSet.toArray(new String[this.termSet.size()]);
     }
 
+    public String[] getUniqueTermsAsArray() {
+        return this.uniqueTerms.toArray(new String[this.termSet.size()]);
+    }
+
     public synchronized void addTerms(String[] terms) {
         this.termSet.addAll(Arrays.asList(terms));
     }

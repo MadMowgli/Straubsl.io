@@ -62,4 +62,40 @@ public class MatrixManager {
 
     }
 
+    public Matrix normalizeVectors(Matrix matrix) {
+
+        Matrix normalizedMatrix = (Matrix) matrix.clone();
+
+        // Normalize each column-vector of given matrix
+        // Normalization of element e = e / vector magnitude
+        // Vector magnitude = sqrt((e_i)^2 + , ..., + (e_n)^2)
+        int rowNum = normalizedMatrix.getRowDimension();
+        int colNum = normalizedMatrix.getColumnDimension();
+
+        // matrix.get(row, col);
+        // matrix.get(m, n);
+        // Calc magnitude of each column vector
+        double squareSum = 0;
+        for(int col = 0; col < colNum; col++) {
+
+            // Calculate square sum
+            for(int row = 0; row < rowNum; row++) {
+                squareSum += Math.pow(normalizedMatrix.get(row, col), 2);
+            }
+
+            // Normalize vector
+            double vectorMagnitude = Math.sqrt(squareSum);
+            for(int row = 0; row < rowNum; row++) {
+                double normalizedElement =
+                        Double.isNaN(normalizedMatrix.get(row, col) / vectorMagnitude)
+                                ? 0 : normalizedMatrix.get(row, col) / vectorMagnitude; // Check for NaN
+                normalizedMatrix.set(row, col, normalizedElement);
+            }
+
+            squareSum = 0;
+
+        }
+        return normalizedMatrix;
+    }
+
 }

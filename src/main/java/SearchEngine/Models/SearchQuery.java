@@ -1,6 +1,6 @@
 package SearchEngine.Models;
 
-public class SeachQuery {
+public class SearchQuery {
 
     // Fields
     private String queryString;
