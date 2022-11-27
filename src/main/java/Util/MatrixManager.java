@@ -98,4 +98,23 @@ public class MatrixManager {
         return normalizedMatrix;
     }
 
+    public double[] normalizeVector(double[] vector) {
+        double[] returnVector = new double[vector.length];
+        double squaredSum = 0;
+
+        // Calculate magnitude of vector
+        for(int i = 0; i < vector.length; i++) {
+            squaredSum += Math.pow(vector[i], 2);
+        }
+        double vectorMagnitude = Math.sqrt(squaredSum);
+
+        // Normalize vector
+        for(int i = 0; i < vector.length; i++) {
+            returnVector[i] = vector[i] / vectorMagnitude;
+        }
+
+        return returnVector;
+
+    }
+
 }

@@ -13,10 +13,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SearchEngine {
 
@@ -71,17 +74,38 @@ public class SearchEngine {
     public void search(SearchQuery query) {
 
         this.performanceTimer.start("transformQuery");
-
-        double[] searchVector = new double[this.matrix.getRowDimension()];
+        double[] frequencyVector = new double[this.matrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
         String[] termSetArray = this.termSet.getUniqueTermsAsArray();
 
         for(int i = 0; i < this.matrix.getRowDimension(); i++) {
-            searchVector[i] = Collections.frequency(queryArray, termSetArray[i]);
+            frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
         }
+        double[] searchVector = matrixManager.normalizeVector(frequencyVector);
         this.performanceTimer.stop("transformQuery");
 
+        // Perform vector search
+        this.performanceTimer.start("vectorSearch");
+        Matrix searchMatrix = new Matrix(searchVector, 1);
+        Matrix resultMatrix = searchMatrix.times(this.normalizedMatrix);
+        this.performanceTimer.stop("vectorSearch");
 
+        // Get indices (corresponds to documents) with highest value
+        // https://stackoverflow.com/a/39819177/10765169
+        // TODO: We only get highest index atm
+        double[] resultVector = resultMatrix.getColumnPackedCopy();
+        double max = Arrays.stream(resultVector).max().orElse(-1);
+        int index = 0;
+        for(int i = 0; i < resultVector.length; i++) {
+            if(resultVector[i] == max) {
+                index = i;
+                break;
+            }
+        }
+
+        // TODO: We need to load in all documents so we can match the index with the documents, lol
+
+        System.out.println(index);
 
     }
 
