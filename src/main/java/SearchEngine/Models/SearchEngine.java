@@ -3,10 +3,9 @@ package SearchEngine.Models;
 import Jama.Matrix;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.TermSet;
-import Util.JamaUtils;
-import Util.LogFormatter;
-import Util.MatrixManager;
-import Util.PerformanceTimer;
+import PreProcessor.Models.WARCModel;
+import PreProcessor.Models.WETReader;
+import Util.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,8 +33,9 @@ public class SearchEngine {
     private PerformanceTimer performanceTimer;
     private TermSet termSet;
     private MatrixManager matrixManager;
-    private Matrix matrix;
     private Matrix normalizedMatrix;
+    private WETReader wetReader;
+    private WARCModel[] models;
 
     // ------------------------------------------------------------------------------------------------- CONSTRUCTOR
     public SearchEngine() {
@@ -49,42 +49,55 @@ public class SearchEngine {
         this.performanceTimer = new PerformanceTimer();
         this.termSet = new TermSet(configurationManager);
         this.matrixManager = new MatrixManager(configurationManager);
+        this.wetReader = new WETReader();
 
         // Read unique terms from preprocessed file
         performanceTimer.start("loadTermSet");
         termSet.readGlobaltermSet(configurationManager.privateProperties.getProperty("Files.Path.LastTermSet"));
         performanceTimer.stop("loadTermSet");
 
-        // Load Matrix
+        // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-        this.matrix = matrixManager.loadMatrix();
+        this.normalizedMatrix = matrixManager.loadMatrix("normalizedMatrix");
         performanceTimer.stop("loadMatrix");
 
-        // Normalize matrix
-        this.performanceTimer.start("normalizeMatrix");
-        this.normalizedMatrix = matrixManager.normalizeVectors(this.matrix);
-        this.performanceTimer.start("normalizeMatrix");
+        // Normalize matrix - already done.
+//        this.performanceTimer.start("normalizeMatrix");
+//        this.normalizedMatrix = matrixManager.normalizeVectors(this.matrix);
+//        this.matrixManager.writeMatrix(this.normalizedMatrix, "normalizedMatrix");
+//        this.performanceTimer.start("normalizeMatrix");
+
+        // Read input & convert each WARC-section to an object
+        performanceTimer.start("loadWarcModels");
+        WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
+        this.models = modelManager.loadModels("models");
+        performanceTimer.stop("loadWarcModels");
+        logger.info("Number of total Models: " + this.models.length);
 
         // Check initialization
-        this.logger.info("SearchEngine initialized - " + matrix.getRowDimension() + "x" + matrix.getColumnDimension());
+        this.logger.info("SearchEngine initialized - " + normalizedMatrix.getRowDimension() + "x" + normalizedMatrix.getColumnDimension());
 
     }
 
     // ------------------------------------------------------------------------------------------------- METHODS
-    public void search(SearchQuery query) {
+    public WARCModel search(SearchQuery query) {
 
         this.performanceTimer.start("transformQuery");
-        double[] frequencyVector = new double[this.matrix.getRowDimension()];
+        // Clean query
+        query.setQueryString(StringCleaner.cleanString(query.getQueryString()));
+
+        double[] frequencyVector = new double[this.normalizedMatrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
         String[] termSetArray = this.termSet.getUniqueTermsAsArray();
 
-        for(int i = 0; i < this.matrix.getRowDimension(); i++) {
+        for(int i = 0; i < this.normalizedMatrix.getRowDimension(); i++) {
             frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
         }
         double[] searchVector = matrixManager.normalizeVector(frequencyVector);
         this.performanceTimer.stop("transformQuery");
 
         // Perform vector search
+        // TODO: I think we're messing up during the multiplication?
         this.performanceTimer.start("vectorSearch");
         Matrix searchMatrix = new Matrix(searchVector, 1);
         Matrix resultMatrix = searchMatrix.times(this.normalizedMatrix);
@@ -93,7 +106,7 @@ public class SearchEngine {
         // Get indices (corresponds to documents) with highest value
         // https://stackoverflow.com/a/39819177/10765169
         // TODO: We only get highest index atm
-        double[] resultVector = resultMatrix.getColumnPackedCopy();
+        double[] resultVector = resultMatrix.getRowPackedCopy();
         double max = Arrays.stream(resultVector).max().orElse(-1);
         int index = 0;
         for(int i = 0; i < resultVector.length; i++) {
@@ -103,9 +116,8 @@ public class SearchEngine {
             }
         }
 
-        // TODO: We need to load in all documents so we can match the index with the documents, lol
-
-        System.out.println(index);
+        // Match index with models
+        return this.models[index];
 
     }
 

@@ -9,9 +9,11 @@ import PreProcessor.Runnables.LocalUniquesRunnable;
 import Util.LogFormatter;
 import Util.MatrixManager;
 import Util.PerformanceTimer;
+import Util.WARCModelManager;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -39,12 +41,13 @@ public class Driver {
         TermSet termSet = new TermSet(configurationManager);
         WETReader wetReader = new WETReader();
         MatrixManager matrixManager = new MatrixManager(configurationManager);
+        WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
 
         // Read unique terms from file to save time
         // termSet.readGlobaltermSet(configurationManager.privateProperties.getProperty("Files.Path.LastTermSet"));
 
 
-        // Read input & convert each WARC-section to an object CHINESE
+        // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         String[] cont = wetReader.readLines(WET_FILE_PATH);
         WARCModel[] models_eur = wetReader.toEurModelArray(cont);
@@ -54,6 +57,12 @@ public class Driver {
         // We have to split our model-array to avoid OutOfMemoryError when creating Matrix
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
         WARCModel[] models_chunk = Arrays.copyOfRange(models_eur, 0, models_eur.length/splitter);
+
+        // Write chunk to disk
+        performanceTimer.start("serializeModels");
+        modelManager.serializeModels(models_chunk, "models");
+        performanceTimer.stop("serializeModels");
+
 
         // Unload content from RAM
         cont = null;
@@ -79,38 +88,14 @@ public class Driver {
 
         System.out.println(termSet.getTermSetAsArray().length);
 
-         /* Create document-term-matrix
-                X-Axis (n): models_eur.length
-                Y-Axis (m): termSet.size()
-          */
-        performanceTimer.start("createMatrixArray");
-        double[][] values = new double[termSet.getUniqueTerms().size()][models_chunk.length];
-        int m = 0;
-        int n = 0;
-        for(WARCModel model : models_chunk) {
-            m = 0;
-            for(String term : termSet.getUniqueTerms()) {
-                values[m][n] = Collections.frequency(model.getContent(), term);
-                m++;
-            }
-            n++;
-        }
-        performanceTimer.stop("createMatrixArray");
-
-        // Form it into JAMA matrix
-        performanceTimer.start("createMatrix");
-        Matrix documentTermMatrix = new Matrix(values);
-        performanceTimer.stop("createMatrix");
-
-        // Write content of matrix down
-        performanceTimer.start("writeMatrix");
-        matrixManager.writeMatrix(documentTermMatrix);  // Matrix with data.splitter=4 is 11Gb big...
-        performanceTimer.stop("writeMatrix");
+        // Create document-term-matrix
+        Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_chunk, termSet.getUniqueTerms());
 
         // Load Matrix
-        Matrix matrix = matrixManager.loadMatrix();
+        // Matrix matrix = matrixManager.loadMatrix("matrix");
 
-        System.out.println("debug");
+        System.out.println("Preprocessing done.");
+        logger.info("Preprocessing done.");
 
     }
 

@@ -2,18 +2,19 @@ package PreProcessor.Models;
 
 import PreProcessor.Driver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-public class WARCModel {
+public class WARCModel implements Serializable {
 
     // Fields
     private String targetUri;
     private String date;
     private ArrayList<String> content;
     private ArrayList<String> languages;
-    private Logger logger;
+
 
 
     // Constructor
@@ -22,7 +23,7 @@ public class WARCModel {
         this.date = date;
         this.content = content;
         this.languages = languages;
-        this.logger = Logger.getLogger(Driver.LOGGER_NAME);
+
     }
 
     // Custom methods

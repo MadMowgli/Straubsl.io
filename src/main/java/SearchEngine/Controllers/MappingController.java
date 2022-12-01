@@ -1,5 +1,6 @@
 package SearchEngine.Controllers;
 
+import PreProcessor.Models.WARCModel;
 import SearchEngine.Models.SearchQuery;
 import SearchEngine.Models.SearchEngine;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,8 @@ public class MappingController {
 
         // Grab the search query & pass it to the search engine to transform into vector
         model.addAttribute("query", query);
-        searchEngine.search(query);
+        WARCModel warcModel = searchEngine.search(query);
+        model.addAttribute("warcModel", warcModel);
 
         return "result";
     }

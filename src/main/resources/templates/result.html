@@ -29,7 +29,7 @@
   </div>
   <div class="row">
     <div class="col-9">
-      <p class="text-center" th:text="${query.getQueryString()}"></p>
+      <a class="text-center" th:href="@{${warcModel.getTargetUri()}}">Link</a>
     </div>
     <div class="col-3">
       <p class="text-center" th:text="${query.getQueryString()}"></p>
