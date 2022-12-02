@@ -30,7 +30,8 @@ public class SearchEngineDummy {
         this.termSet = new TermSet(configurationManager);
         this.wetReader = new WETReader();
         WARCModelManager modelManager = new WARCModelManager(configurationManager, Logger.getLogger(""));
-        this.models = modelManager.loadModels("models");
+        int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
+        this.models = modelManager.loadModels("models_" + splitter);
     }
 
     public ArrayList<WARCModel> search(SearchQuery query) {

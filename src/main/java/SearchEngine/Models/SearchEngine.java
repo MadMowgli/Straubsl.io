@@ -70,7 +70,8 @@ public class SearchEngine {
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
-        this.models = modelManager.loadModels("models");
+        int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
+        this.models = modelManager.loadModels("models_" + splitter);
         performanceTimer.stop("loadWarcModels");
         logger.info("Number of total Models: " + this.models.length);
 

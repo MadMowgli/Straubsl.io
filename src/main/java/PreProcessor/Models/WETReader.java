@@ -130,7 +130,8 @@ public class WETReader {
                 } else {
 
                     // Basic noise filtering
-                    if(StringCleaner.shouldAddString(line)) {
+                    if(StringCleaner.shouldAddString(line) &&
+                            !StringCleaner.cleanString(line).equalsIgnoreCase("contentlength ")) {
 
                         // Clear line from non-alphabetic character / make lowercase
                         String cleanedLine = StringCleaner.cleanString(line);
@@ -141,7 +142,10 @@ public class WETReader {
 
             if(createObject) {
                 createObject = false;
-                warcModels.add(new WARCModel(targetUri, date, contentArray, languages));
+                if(contentArray.size() != 0) {
+                    warcModels.add(new WARCModel(targetUri, date, contentArray, languages));
+                }
+
                 targetUri = "";
                 date = "";
             }
