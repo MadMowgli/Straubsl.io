@@ -30,3 +30,15 @@
 - **Switch to LSI**
   - Due to the classical approach of the VSM-cosine-search being slow (and faulty atm), I'll re-check the construction
     of my document-term-matrix and swap to the Latent Semantics Indexing approach.
+
+
+## 02.12.2022
+- **SVD is taking a lot of time**
+  - Performing Singular Value Decomposition (SVD) on a matrix is taking up lots of time, e.g. multiple hours.
+  - I can run this overnight, however I don't think the time will be enough.
+  - Otherwise I'll have to reduce the data set again
+
+<br>
+
+- **Thymeleaf has problems with CSS styling**
+  - No clue why - but it seems to be a common problem https://stackoverflow.com/questions/53203909/spring-boot-thymeleaf-css-is-not-applied-to-template

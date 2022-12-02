@@ -148,6 +148,8 @@ public class WETReader {
 
         }
 
+        // Remove the first element, this is some commoncrawl-element
+        warcModels.remove(0);
         return warcModels.toArray(new WARCModel[0]);
     }
 

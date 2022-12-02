@@ -1,6 +1,7 @@
 package PreProcessor;
 
 import Jama.Matrix;
+import Jama.SingularValueDecomposition;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.TermSet;
 import PreProcessor.Models.WARCModel;
@@ -57,10 +58,11 @@ public class Driver {
         // We have to split our model-array to avoid OutOfMemoryError when creating Matrix
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
         WARCModel[] models_chunk = Arrays.copyOfRange(models_eur, 0, models_eur.length/splitter);
+        logger.info("Number of Models in chunk: " + models_chunk.length);
 
         // Write chunk to disk
         performanceTimer.start("serializeModels");
-        modelManager.serializeModels(models_chunk, "models");
+        modelManager.serializeModels(models_chunk, "models_" + splitter);
         performanceTimer.stop("serializeModels");
 
 
@@ -81,20 +83,20 @@ public class Driver {
         performanceTimer.start("getGlobalUniques");
         termSet.sortTermSet();
         performanceTimer.stop("getGlobalUniques");
-        logger.info("getGlobalUniques: " + performanceTimer.getRecords().get("getGlobalUniques"));
+        logger.info("Number of unique terms: " + termSet.getUniqueTerms().size());
 
         // Save the global TermSet
-        termSet.writeGlobalTermSet();
-
-        System.out.println(termSet.getTermSetAsArray().length);
+        termSet.writeGlobalTermSet("termset_" + splitter);
 
         // Create document-term-matrix
         Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_chunk, termSet.getUniqueTerms());
 
-        // Load Matrix
-        // Matrix matrix = matrixManager.loadMatrix("matrix");
+        // Write matrix
+        matrixManager.writeMatrix(documentTermMatrix, "matrix_" + splitter);
 
-        System.out.println("Preprocessing done.");
+        // Create SVD matrix
+        // SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
+        performanceTimer.logStatements();
         logger.info("Preprocessing done.");
 
     }

@@ -2,6 +2,7 @@ package Util;
 import PreProcessor.Driver;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class PerformanceTimer {
@@ -38,6 +39,11 @@ public class PerformanceTimer {
 
     }
 
+    public void logStatements() {
+        for(Map.Entry<String, Long> entry : this.records.entrySet()) {
+            this.logger.info("Performance Timer Log: " + entry.getKey() + ":" + entry.getValue());
+        }
+    }
 
     // Getters
     public HashMap<String, Long> getRecords() {

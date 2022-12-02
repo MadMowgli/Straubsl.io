@@ -25,7 +25,8 @@ public class StringCleaner {
      */
     public static boolean shouldAddString(String input) {
         return input.length() <= 35
-                && !input.isBlank();
+                && !input.isBlank()
+                && !input.equals("contentlength ");
     }
 
 }

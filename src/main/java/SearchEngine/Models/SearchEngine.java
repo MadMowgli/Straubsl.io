@@ -80,7 +80,7 @@ public class SearchEngine {
     }
 
     // ------------------------------------------------------------------------------------------------- METHODS
-    public WARCModel search(SearchQuery query) {
+    public ArrayList<WARCModel> search(SearchQuery query) {
 
         this.performanceTimer.start("transformQuery");
         // Clean query
@@ -117,7 +117,10 @@ public class SearchEngine {
         }
 
         // Match index with models
-        return this.models[index];
+        // return this.models[index];
+
+        // Dummy object
+        return new ArrayList<WARCModel>(Arrays.asList(this.models).subList(0, 10));
 
     }
 

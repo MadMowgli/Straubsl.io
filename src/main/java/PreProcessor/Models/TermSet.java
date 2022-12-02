@@ -165,6 +165,34 @@ public class TermSet {
 
     }
 
+    // Method overload to write to named file
+    public void writeGlobalTermSet(String name) {
+
+        // Construct filename
+        String dirName = System.getProperty("user.dir") + this.configManager.properties.getProperty("Files.Path.TermSet");
+        String fileName = dirName + name + ".txt";
+
+        // Create logging directory if not exists
+        try {
+            Files.createDirectories(Paths.get(dirName));
+        } catch (Exception e) {
+            this.logger.severe(e.getMessage());
+        }
+
+        this.timer.start("WriteOutput");
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, false))) {
+
+            for(String term : this.uniqueTerms) {
+                bufferedWriter.write(term + "\n");
+            }
+
+        } catch (Exception e) {
+            this.logger.severe(e.getMessage());
+        }
+        this.timer.stop("WriteOutput");
+
+    }
+
     // Method overload to periodically write content while filtering
     public synchronized void writeGlobalTermSet(Collection<ArrayList<String>> content) {
 

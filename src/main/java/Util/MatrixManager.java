@@ -154,4 +154,16 @@ public class MatrixManager {
 
     }
 
+    // ----------------------------------------------------------------------------------------------- Testing
+    public double getMaxValue(Matrix matrix) {
+        double[][] values = matrix.getArray();
+        double max = 0;
+        for(int row = 0; row < matrix.getRowDimension(); row++) {
+            for(int col = 0; col < matrix.getColumnDimension(); col++) {
+                max = Math.max(values[row][col], max);
+            }
+        }
+        return max;
+    }
+
 }
