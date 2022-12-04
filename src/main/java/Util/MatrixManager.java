@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 public class MatrixManager {
 
     // Fields
-    private ConfigurationManager configManager;
-    private Logger logger;
-    private PerformanceTimer performanceTimer;
+    private final ConfigurationManager configManager;
+    private final Logger logger;
+    private final PerformanceTimer performanceTimer;
 
     // Constructor
     public MatrixManager(ConfigurationManager configurationManager) {
@@ -35,14 +35,14 @@ public class MatrixManager {
 
         // Create Directory if not exists
         try {
-            String dirPath = System.getProperty("user.dir") + (String) configManager.properties.getProperty("Files.Path.Matrix");
+            String dirPath = System.getProperty("user.dir") + configManager.properties.getProperty("Files.Path.Matrix");
             Files.createDirectories(Paths.get(dirPath));
         } catch (Exception e) {
             this.logger.severe(e.getMessage());
         }
 
         // Write object to file
-        String dirPath = System.getProperty("user.dir") + (String) configManager.properties.getProperty("Files.Path.Matrix");
+        String dirPath = System.getProperty("user.dir") + configManager.properties.getProperty("Files.Path.Matrix");
         String filePath = dirPath + name;
         try(ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
             outputStream.writeObject(matrix);
@@ -56,7 +56,7 @@ public class MatrixManager {
     public Matrix loadMatrix(String name) {
 
         // Load matrix from file
-        String dirPath = System.getProperty("user.dir") + (String) configManager.properties.getProperty("Files.Path.Matrix");
+        String dirPath = System.getProperty("user.dir") + configManager.properties.getProperty("Files.Path.Matrix");
         String filePath = dirPath + name;
         // String filePath = dirPath + "Matrix.txt";
 
@@ -82,7 +82,7 @@ public class MatrixManager {
         for(WARCModel model : documents) {
             int row = 0;
             for(String term : uniqueTerms) {
-                values[row][col] = Collections.frequency(model.getContent(), term);
+                values[row][col] = Collections.frequency(model.getTokens(), term);
                 row++;
             }
             col++;

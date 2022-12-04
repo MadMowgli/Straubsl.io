@@ -1,10 +1,12 @@
 package PreProcessor.Models;
 
 import PreProcessor.Driver;
+import Util.StringCleaner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 public class WARCModel implements Serializable {
@@ -13,7 +15,7 @@ public class WARCModel implements Serializable {
     private String targetUri;
     private String date;
     private ArrayList<String> content;
-    private ArrayList<String> languages;
+    private final ArrayList<String> languages;
 
 
 
@@ -23,7 +25,6 @@ public class WARCModel implements Serializable {
         this.date = date;
         this.content = content;
         this.languages = languages;
-
     }
 
     // Custom methods
@@ -32,9 +33,7 @@ public class WARCModel implements Serializable {
         ArrayList<String> uniques = new ArrayList<>();
 
         // First, split content up nto words
-        for(String line : this.content) {
-            terms.addAll(Arrays.asList(line.split(" ")));
-        }
+        terms = this.getTokens();
 
         // Then, create an array of unique terms
         for(String term : terms) {
@@ -42,7 +41,6 @@ public class WARCModel implements Serializable {
                 uniques.add(term);
             }
         }
-
         return uniques.toArray(new String[uniques.size()]);
     }
 
@@ -74,5 +72,19 @@ public class WARCModel implements Serializable {
 
     public ArrayList<String> getLanguages() {
         return languages;
+    }
+
+    public ArrayList<String> getTokens() {
+
+        ArrayList<String> returnList = new ArrayList<>();
+
+        for (String contentString : this.content) {
+            String[] contentArray = contentString.split(" ");
+            for (String in : contentArray) {
+                returnList.add(StringCleaner.cleanString(in));
+            }
+        }
+
+        return returnList;
     }
 }

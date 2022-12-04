@@ -24,8 +24,13 @@ public class StringCleaner {
      * @return A boolean which indicates if the string meets all criteria.
      */
     public static boolean shouldAddString(String input) {
-        return input.length() <= 35
+        return input.length() <= 300
                 && !input.isBlank()
+                && !input.equalsIgnoreCase("contentlength ");
+    }
+
+    public static boolean shouldAddTestString(String input) {
+        return !input.isBlank()
                 && !input.equalsIgnoreCase("contentlength ");
     }
 

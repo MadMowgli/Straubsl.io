@@ -14,17 +14,17 @@ import java.util.stream.IntStream;
 
 public class WETReader {
 
-    private volatile ArrayList<String> termSet;
-    private Logger logger;
-    private Set<Integer> allowedASciiRange;
-    private Set<String> disallowedLanguages;
+    private final ArrayList<String> termSet;
+    private final Logger logger;
+    private final Set<Integer> allowedASciiRange;
+    private final Set<String> disallowedLanguages;
 
     // Constructor
     public WETReader() {
         this.termSet = new ArrayList<>();
         this.logger = Logger.getLogger(Driver.LOGGER_NAME);
         this.allowedASciiRange = IntStream.rangeClosed(0, 166).boxed().collect(Collectors.toSet());
-        this.disallowedLanguages = Arrays.stream(new String[] {"zho", "kor", "jpn"}).collect(Collectors.toSet());
+        this.disallowedLanguages = Arrays.stream(new String[]{"zho", "kor", "jpn"}).collect(Collectors.toSet());
     }
 
     /**
@@ -153,7 +153,6 @@ public class WETReader {
         }
 
         // Remove the first element, this is some commoncrawl-element
-        warcModels.remove(0);
         return warcModels.toArray(new WARCModel[0]);
     }
 

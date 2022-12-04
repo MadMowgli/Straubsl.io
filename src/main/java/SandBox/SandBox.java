@@ -4,7 +4,9 @@ import Jama.Matrix;
 import Jama.SingularValueDecomposition;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.TermSet;
+import PreProcessor.Models.WARCModel;
 import PreProcessor.Models.WETReader;
+import PreProcessor.Runnables.LocalUniquesRunnable;
 import Util.LogFormatter;
 import Util.MatrixManager;
 import Util.PerformanceTimer;
@@ -12,6 +14,8 @@ import Util.WARCModelManager;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -22,7 +26,8 @@ public class SandBox {
     // Fields
     public static final String LOGGER_NAME = "SandBox";
     private static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
-    private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
+    // private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
+    private static final String WET_FILE_PATH = "data/TestData.wet";
 
     public static void main(String[] args) {
 
@@ -37,14 +42,34 @@ public class SandBox {
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
 
-        // Load matrix & get max value
-        Matrix documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+        // Read input & convert each WARC-section to an object
+        performanceTimer.start("loadWarcModels");
+        String[] cont = wetReader.readLines(WET_FILE_PATH);
+        WARCModel[] models_eur = wetReader.toEurModelArray(cont);
+        performanceTimer.stop("loadWarcModels");
+        logger.info("Number of total Models: " + models_eur.length);
 
-        performanceTimer.start("createSVD");
-        SingularValueDecomposition svd = documentTermMatrix.svd();
-        performanceTimer.stop("createSVD");
-        performanceTimer.logStatements();
-        System.out.println(matrixManager.getMaxValue(documentTermMatrix));
+        // Step 1: Get all the unique terms from the models_eur ("local" uniques)
+        performanceTimer.start("getLocalUniques");
+        try (ExecutorService executorService = Executors.newFixedThreadPool(Integer.parseInt((String) configurationManager.properties.get("MaxThreads.LocalUniques")))) {
+            for (WARCModel model : models_eur) {
+                executorService.submit(new LocalUniquesRunnable(model, termSet));
+            }
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        }
+        performanceTimer.stop("getLocalUniques");
+
+        // Step 2: Get uniques from total of terms  ("global" uniques)
+        performanceTimer.start("getGlobalUniques");
+        termSet.sortTermSet();
+        performanceTimer.stop("getGlobalUniques");
+        logger.info("Number of unique terms: " + termSet.getUniqueTerms().size());
+
+        // Create document-term-matrix
+        Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_eur, termSet.getUniqueTerms());
+        System.out.println("debug");
+
     }
 
     public static void configureLogger() {
