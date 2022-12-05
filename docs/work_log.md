@@ -42,3 +42,9 @@
 
 - **Thymeleaf has problems with CSS styling**
   - No clue why - but it seems to be a common problem https://stackoverflow.com/questions/53203909/spring-boot-thymeleaf-css-is-not-applied-to-template
+
+
+## 04.12.2022
+- Filtering out stop-words
+  - The SVD-matrices get "destracted" from stop-words atm. Building in a function that filters out the stop-words will help.
+    To do so, 

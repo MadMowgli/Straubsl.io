@@ -26,6 +26,7 @@ public class SearchEngine {
     public static final String LOGGER_NAME = "SpringSearch";
     public static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
     public static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
+    private final StringCleaner stringCleaner;
 
     // ------------------------------------------------------------------------------------------------- FIELDS
     private Logger logger;
@@ -49,7 +50,8 @@ public class SearchEngine {
         this.performanceTimer = new PerformanceTimer();
         this.termSet = new TermSet(configurationManager);
         this.matrixManager = new MatrixManager(configurationManager);
-        this.wetReader = new WETReader();
+        this.wetReader = new WETReader(configurationManager);
+        this.stringCleaner = new StringCleaner(configurationManager);
 
         // Read unique terms from preprocessed file
         performanceTimer.start("loadTermSet");
@@ -85,7 +87,7 @@ public class SearchEngine {
 
         this.performanceTimer.start("transformQuery");
         // Clean query
-        query.setQueryString(StringCleaner.cleanString(query.getQueryString()));
+        query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
 
         double[] frequencyVector = new double[this.normalizedMatrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));

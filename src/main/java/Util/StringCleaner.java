@@ -1,10 +1,32 @@
 package Util;
 
+import PreProcessor.Configuration.ConfigurationManager;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+
 public class StringCleaner {
 
     // Fields
+    private ArrayList<String> stopWords;
+
 
     // Constructor
+    public StringCleaner(ConfigurationManager configurationManager) {
+
+        // Read stop-words from file
+        this.stopWords = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new FileReader(configurationManager.properties.getProperty("Files.Path.StopWords")))) {
+            String line = "";
+            while((line = bufferedReader.readLine()) != null) {
+                this.stopWords.add(line);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     /**
      * This function provides some basic data pre-processing (such as removing non-alphabetic characters from the string) to remove noise and duplicates in the unique term set.
@@ -12,7 +34,7 @@ public class StringCleaner {
      * @return The cleaned string.
      */
     // Methods
-    public static String cleanString(String input) {
+    public String cleanString(String input) {
         // Remove all non-alphabetic characters & make lowercase
         return input.replaceAll("[^a-zA-Z|^\s|äöüÄÖÜèéà]", "").toLowerCase();
     }
@@ -23,15 +45,14 @@ public class StringCleaner {
      * @param input The string which needs to be checked.
      * @return A boolean which indicates if the string meets all criteria.
      */
-    public static boolean shouldAddString(String input) {
-        return input.length() <= 300
+    public boolean shouldAddString(String input) {
+        return input.length() <= 35
                 && !input.isBlank()
-                && !input.equalsIgnoreCase("contentlength ");
+                && !input.isEmpty()
+                && !input.equalsIgnoreCase("\n")
+                && !input.equalsIgnoreCase("contentlength")
+                && !this.stopWords.contains(input);
     }
 
-    public static boolean shouldAddTestString(String input) {
-        return !input.isBlank()
-                && !input.equalsIgnoreCase("contentlength ");
-    }
 
 }

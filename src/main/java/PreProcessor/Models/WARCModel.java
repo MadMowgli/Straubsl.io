@@ -15,7 +15,7 @@ public class WARCModel implements Serializable {
     private String targetUri;
     private String date;
     private ArrayList<String> content;
-    private final ArrayList<String> languages;
+    private ArrayList<String> languages;
 
 
 
@@ -25,6 +25,7 @@ public class WARCModel implements Serializable {
         this.date = date;
         this.content = content;
         this.languages = languages;
+
     }
 
     // Custom methods
@@ -32,11 +33,8 @@ public class WARCModel implements Serializable {
         ArrayList<String> terms = new ArrayList<>();
         ArrayList<String> uniques = new ArrayList<>();
 
-        // First, split content up nto words
-        terms = this.getTokens();
-
-        // Then, create an array of unique terms
-        for(String term : terms) {
+        // Create an array of unique terms
+        for(String term : this.getContent()) {
             if(!uniques.contains(term) && !term.isBlank()) {
                 uniques.add(term);
             }
@@ -74,17 +72,4 @@ public class WARCModel implements Serializable {
         return languages;
     }
 
-    public ArrayList<String> getTokens() {
-
-        ArrayList<String> returnList = new ArrayList<>();
-
-        for (String contentString : this.content) {
-            String[] contentArray = contentString.split(" ");
-            for (String in : contentArray) {
-                returnList.add(StringCleaner.cleanString(in));
-            }
-        }
-
-        return returnList;
-    }
 }

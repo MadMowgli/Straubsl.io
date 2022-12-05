@@ -29,8 +29,8 @@ public class Driver {
     // Fields
     public static final String LOGGER_NAME = "PreProcessor";
     private static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
-    // private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
-    private static final String WET_FILE_PATH = "data/TestData";
+    private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
+    // private static final String WET_FILE_PATH = "data/TestData";
 
     // Main method
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ public class Driver {
         ConfigurationManager configurationManager = new ConfigurationManager();
         PerformanceTimer performanceTimer = new PerformanceTimer();
         TermSet termSet = new TermSet(configurationManager);
-        WETReader wetReader = new WETReader();
+        WETReader wetReader = new WETReader(configurationManager);
         MatrixManager matrixManager = new MatrixManager(configurationManager);
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
 
@@ -96,9 +96,22 @@ public class Driver {
         matrixManager.writeMatrix(documentTermMatrix, "matrix_" + splitter);
 
         // Create SVD matrix
-        // SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
+        performanceTimer.start("createSVD");
+        models_chunk = null;
+        termSet = null;
+        wetReader = null;
+        System.gc();
+        SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
+        performanceTimer.stop("createSVD");
+
+        // Write SVD
+        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v");
+        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u");
+        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s");
         performanceTimer.logStatements();
         logger.info("Preprocessing done.");
+
+        System.exit(1);
 
     }
 

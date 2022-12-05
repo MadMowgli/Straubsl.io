@@ -37,38 +37,28 @@ public class SandBox {
         ConfigurationManager configurationManager = new ConfigurationManager();
         PerformanceTimer performanceTimer = new PerformanceTimer();
         TermSet termSet = new TermSet(configurationManager);
-        WETReader wetReader = new WETReader();
+        WETReader wetReader = new WETReader(configurationManager);
         MatrixManager matrixManager = new MatrixManager(configurationManager);
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
 
-        // Read input & convert each WARC-section to an object
-        performanceTimer.start("loadWarcModels");
-        String[] cont = wetReader.readLines(WET_FILE_PATH);
-        WARCModel[] models_eur = wetReader.toEurModelArray(cont);
-        performanceTimer.stop("loadWarcModels");
-        logger.info("Number of total Models: " + models_eur.length);
-
-        // Step 1: Get all the unique terms from the models_eur ("local" uniques)
-        performanceTimer.start("getLocalUniques");
-        try (ExecutorService executorService = Executors.newFixedThreadPool(Integer.parseInt((String) configurationManager.properties.get("MaxThreads.LocalUniques")))) {
-            for (WARCModel model : models_eur) {
-                executorService.submit(new LocalUniquesRunnable(model, termSet));
-            }
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-        }
-        performanceTimer.stop("getLocalUniques");
-
-        // Step 2: Get uniques from total of terms  ("global" uniques)
-        performanceTimer.start("getGlobalUniques");
-        termSet.sortTermSet();
-        performanceTimer.stop("getGlobalUniques");
-        logger.info("Number of unique terms: " + termSet.getUniqueTerms().size());
-
         // Create document-term-matrix
-        Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_eur, termSet.getUniqueTerms());
+        performanceTimer.start("loadBagOfWords");
+        Matrix documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+        performanceTimer.stop("loadBagOfWords");
+
+        performanceTimer.start("createSVD");
+        SingularValueDecomposition svd = documentTermMatrix.svd();
+        performanceTimer.stop("createSVD");
+
+        performanceTimer.start("writeSVDComponents");
+        matrixManager.writeMatrix(svd.getV(), "svd_v");
+        matrixManager.writeMatrix(svd.getU(), "svd_u");
+        matrixManager.writeMatrix(svd.getS(), "svd_s");
+        performanceTimer.stop("writeSVDComponents");
+        performanceTimer.logStatements();
         System.out.println("debug");
+        System.exit(1);
 
     }
 

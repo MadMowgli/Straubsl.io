@@ -1,5 +1,6 @@
 package PreProcessor.Models;
 
+import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Driver;
 import Util.StringCleaner;
 
@@ -14,17 +15,20 @@ import java.util.stream.IntStream;
 
 public class WETReader {
 
-    private final ArrayList<String> termSet;
-    private final Logger logger;
-    private final Set<Integer> allowedASciiRange;
-    private final Set<String> disallowedLanguages;
+
+    private final StringCleaner stringCleaner;
+    private volatile ArrayList<String> termSet;
+    private Logger logger;
+    private Set<Integer> allowedASciiRange;
+    private Set<String> disallowedLanguages;
 
     // Constructor
-    public WETReader() {
+    public WETReader(ConfigurationManager configurationManager) {
         this.termSet = new ArrayList<>();
         this.logger = Logger.getLogger(Driver.LOGGER_NAME);
         this.allowedASciiRange = IntStream.rangeClosed(0, 166).boxed().collect(Collectors.toSet());
-        this.disallowedLanguages = Arrays.stream(new String[]{"zho", "kor", "jpn"}).collect(Collectors.toSet());
+        this.disallowedLanguages = Arrays.stream(new String[] {"zho", "kor", "jpn"}).collect(Collectors.toSet());
+        this.stringCleaner = new StringCleaner(configurationManager);
     }
 
     /**
@@ -130,13 +134,13 @@ public class WETReader {
                 } else {
 
                     // Basic noise filtering
-                    if(StringCleaner.shouldAddString(line) &&
-                            !StringCleaner.cleanString(line).equalsIgnoreCase("contentlength ")) {
-
-                        // Clear line from non-alphabetic character / make lowercase
-                        String cleanedLine = StringCleaner.cleanString(line);
-                        contentArray.add(cleanedLine);
+                    for(String token : line.split(" ")) {
+                        if(stringCleaner.shouldAddString(stringCleaner.cleanString(token))) {
+                            // Clear line from non-alphabetic character / make lowercase
+                            contentArray.add(stringCleaner.cleanString(token));
+                        }
                     }
+
                 }
             }
 

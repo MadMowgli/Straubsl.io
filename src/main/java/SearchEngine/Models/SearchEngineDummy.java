@@ -28,7 +28,7 @@ public class SearchEngineDummy {
         // Initialize stuff
         this.configurationManager = new ConfigurationManager();
         this.termSet = new TermSet(configurationManager);
-        this.wetReader = new WETReader();
+        this.wetReader = new WETReader(configurationManager);
         WARCModelManager modelManager = new WARCModelManager(configurationManager, Logger.getLogger(""));
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
         this.models = modelManager.loadModels("models_" + splitter);
