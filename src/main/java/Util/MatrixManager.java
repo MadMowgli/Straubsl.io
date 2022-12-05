@@ -154,6 +154,69 @@ public class MatrixManager {
 
     }
 
+    public double getCosineSimilarity(double[] vector_a, double[] vector_b) {
+
+        // Step 0: Both vectors must have the same number of elements
+        if(vector_a.length != vector_b.length) {
+            logger.severe("Could not calculate cosine similarity due to non-identical number of elements in each vector.");
+            throw new ArithmeticException("Vector A and vector B must have the same number of elements!");
+        }
+
+        // Step 1: Calculate dot-product of each vector
+        double dotProduct = 0;
+        for(int i = 0; i < vector_a.length; i++) {
+            dotProduct += Double.isNaN(vector_a[i] * vector_b[i]) ? 0 : vector_a[i] * vector_b[i];
+        }
+
+        // Step 2: Calculate dot-product of each normalized vector
+        double[] normalized_a = this.normalizeVector(vector_a);
+        double[] normalized_b = this.normalizeVector(vector_b);
+        double normalizedDotProduct = 0;
+        for(int i = 0; i < normalized_a.length; i++) {
+            normalizedDotProduct += Double.isNaN(normalized_a[i] * normalized_b[i]) ? 0 : normalized_a[i] * normalized_b[i];
+        }
+
+        // Step 3: Divide dot-product of each vector by dot-product of each normalized vector
+        return dotProduct / normalizedDotProduct;
+
+    }
+
+    public double[] getCosineSimilarity(double[] vector, Matrix matrix) {
+
+        // Step 0: Vector must have the same number of elements as either matrix_m or matrix_n
+        if(vector.length != matrix.getColumnDimension() && vector.length != matrix.getRowDimension()) {
+            logger.severe("Could not calculate cosine similarity due to non-identical number of elements in each vector.");
+            throw new ArithmeticException("Vector A must have the same number of elements as matrix.getRowDimension() or matrix.getColDimension()!");
+        }
+
+        double[] returnVector = new double[matrix.getColumnDimension()];
+
+        try {
+            // Step 1: Calculate cosine-similarity of each col/row (depending on size)
+            if(vector.length == matrix.getColumnDimension()) {
+                // In this case, we can work with row-vectors -> no need to transpose the matrix first
+                for(int i = 0; i < matrix.getColumnDimension(); i ++) {
+                    returnVector[i] = this.getCosineSimilarity(vector, matrix.getArray()[i]);
+                }
+            }
+
+            if(vector.length == matrix.getRowDimension()) {
+                // Here we first need to transpose the matrix, since we can't access the column vectors directly via array
+                Matrix transpose = matrix.transpose();
+                for(int i = 0; i < transpose.getColumnDimension() - 1; i++) {
+                    returnVector[i] = this.getCosineSimilarity(vector, transpose.getArray()[i]);
+                }
+            }
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        }
+
+
+        // The highest number in the returned vector is the index of the document the query corresponds the most with
+        return returnVector;
+
+    }
+
     // ----------------------------------------------------------------------------------------------- Testing
     public double getMaxValue(Matrix matrix) {
         double[][] values = matrix.getArray();

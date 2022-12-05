@@ -65,6 +65,7 @@ public class Driver {
         performanceTimer.start("serializeModels");
         modelManager.serializeModels(models_chunk, "models_" + splitter);
         performanceTimer.stop("serializeModels");
+        logger.info("Model-Chunk written to disk.");
 
 
         // Unload content from RAM
@@ -88,26 +89,24 @@ public class Driver {
 
         // Save the global TermSet
         termSet.writeGlobalTermSet("termset_" + splitter);
+        logger.info("Global term set written to disk");
 
         // Create document-term-matrix
         Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_chunk, termSet.getUniqueTerms());
 
         // Write matrix
         matrixManager.writeMatrix(documentTermMatrix, "matrix_" + splitter);
+        logger.info("Global term set written to disk");
 
         // Create SVD matrix
-        performanceTimer.start("createSVD");
-        models_chunk = null;
-        termSet = null;
-        wetReader = null;
-        System.gc();
-        SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
-        performanceTimer.stop("createSVD");
-
-        // Write SVD
-        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v");
-        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u");
-        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s");
+//        performanceTimer.start("createSVD");
+//        SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
+//        performanceTimer.stop("createSVD");
+//
+//        // Write SVD
+//        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v");
+//        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u");
+//        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s");
         performanceTimer.logStatements();
         logger.info("Preprocessing done.");
 

@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class MappingController {
 
     // -------------------------- Fields
-    // private final SearchEngine searchEngine = new SearchEngine();
-    private final SearchEngineDummy searchEngine = new SearchEngineDummy();
+    private final SearchEngine searchEngine = new SearchEngine();
+    // private final SearchEngineDummy searchEngine = new SearchEngineDummy();
 
 
     // -------------------------- Mappings

@@ -34,7 +34,8 @@ public class SearchEngine {
     private PerformanceTimer performanceTimer;
     private TermSet termSet;
     private MatrixManager matrixManager;
-    private Matrix normalizedMatrix;
+
+    private Matrix documentTermMatrix;
     private WETReader wetReader;
     private WARCModel[] models;
 
@@ -52,18 +53,20 @@ public class SearchEngine {
         this.matrixManager = new MatrixManager(configurationManager);
         this.wetReader = new WETReader(configurationManager);
         this.stringCleaner = new StringCleaner(configurationManager);
+        int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
 
         // Read unique terms from preprocessed file
         performanceTimer.start("loadTermSet");
-        termSet.readGlobaltermSet(configurationManager.privateProperties.getProperty("Files.Path.LastTermSet"));
+        termSet.readGlobaltermSet("termset_" + splitter);
         performanceTimer.stop("loadTermSet");
 
         // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-        this.normalizedMatrix = matrixManager.loadMatrix("normalizedMatrix");
+        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
         performanceTimer.stop("loadMatrix");
 
-        // Normalize matrix - already done.
+        // Normalize matrix - we don't need this since we normalize the vectors on the fly
+        // TODO: Maybe normalize it beforehand? Gives a performance boost...
 //        this.performanceTimer.start("normalizeMatrix");
 //        this.normalizedMatrix = matrixManager.normalizeVectors(this.matrix);
 //        this.matrixManager.writeMatrix(this.normalizedMatrix, "normalizedMatrix");
@@ -72,13 +75,12 @@ public class SearchEngine {
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
-        int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
         this.models = modelManager.loadModels("models_" + splitter);
         performanceTimer.stop("loadWarcModels");
         logger.info("Number of total Models: " + this.models.length);
 
         // Check initialization
-        this.logger.info("SearchEngine initialized - " + normalizedMatrix.getRowDimension() + "x" + normalizedMatrix.getColumnDimension());
+        this.logger.info("SearchEngine initialized - " + documentTermMatrix.getRowDimension() + "x" + documentTermMatrix.getColumnDimension());
 
     }
 
@@ -89,41 +91,42 @@ public class SearchEngine {
         // Clean query
         query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
 
-        double[] frequencyVector = new double[this.normalizedMatrix.getRowDimension()];
+        double[] frequencyVector = new double[this.documentTermMatrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
         String[] termSetArray = this.termSet.getUniqueTermsAsArray();
 
-        for(int i = 0; i < this.normalizedMatrix.getRowDimension(); i++) {
+        for(int i = 0; i < this.documentTermMatrix.getRowDimension(); i++) {
             frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
         }
-        double[] searchVector = matrixManager.normalizeVector(frequencyVector);
+        // double[] searchVector = matrixManager.normalizeVector(frequencyVector);
         this.performanceTimer.stop("transformQuery");
 
         // Perform vector search
         // TODO: I think we're messing up during the multiplication?
-        this.performanceTimer.start("vectorSearch");
-        Matrix searchMatrix = new Matrix(searchVector, 1);
-        Matrix resultMatrix = searchMatrix.times(this.normalizedMatrix);
-        this.performanceTimer.stop("vectorSearch");
+        this.performanceTimer.start("cosineSearch");
+        double[] cosineResult = matrixManager.getCosineSimilarity(frequencyVector, documentTermMatrix);
+        this.performanceTimer.stop("cosineSearch");
 
         // Get indices (corresponds to documents) with highest value
         // https://stackoverflow.com/a/39819177/10765169
         // TODO: We only get highest index atm
-        double[] resultVector = resultMatrix.getRowPackedCopy();
-        double max = Arrays.stream(resultVector).max().orElse(-1);
+
+        double max = Arrays.stream(cosineResult).max().orElse(-1);
         int index = 0;
-        for(int i = 0; i < resultVector.length; i++) {
-            if(resultVector[i] == max) {
+        for(int i = 0; i < cosineResult.length; i++) {
+            if(cosineResult[i] == max) {
                 index = i;
                 break;
             }
         }
 
         // Match index with models
-        // return this.models[index];
+        ArrayList<WARCModel> returnList = new ArrayList<>();
+        returnList.add(this.models[index]);
+        return returnList;
 
         // Dummy object
-        return new ArrayList<WARCModel>(Arrays.asList(this.models).subList(0, 10));
+        // return new ArrayList<WARCModel>(Arrays.asList(this.models).subList(0, 10));
 
     }
 

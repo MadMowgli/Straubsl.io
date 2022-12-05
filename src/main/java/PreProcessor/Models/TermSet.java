@@ -223,9 +223,13 @@ public class TermSet {
 
     }
 
-    public void readGlobaltermSet(String filePath) {
+    public void readGlobaltermSet(String name) {
 
-        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
+        // Construct filename
+        String dirName = System.getProperty("user.dir") + this.configManager.properties.getProperty("Files.Path.TermSet");
+        String fileName = dirName + name + ".txt";
+
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
             this.uniqueTerms.addAll(bufferedReader.lines().toList());
         } catch (Exception e) {
             this.logger.severe(e.getMessage());
