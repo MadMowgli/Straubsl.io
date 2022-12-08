@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -195,7 +196,7 @@ public class MatrixManager {
             // Step 1: Calculate cosine-similarity of each col/row (depending on size)
             if(vector.length == matrix.getColumnDimension()) {
                 // In this case, we can work with row-vectors -> no need to transpose the matrix first
-                for(int i = 0; i < matrix.getColumnDimension(); i ++) {
+                for(int i = 0; i < matrix.getColumnDimension() - 1; i ++) {
                     returnVector[i] = this.getCosineSimilarity(vector, matrix.getArray()[i]);
                 }
             }
@@ -214,6 +215,49 @@ public class MatrixManager {
 
         // The highest number in the returned vector is the index of the document the query corresponds the most with
         return returnVector;
+
+    }
+
+    public Matrix performLatentSemanticIndexing(Matrix T, Matrix S, Matrix D, int k) {
+
+        // Step 0: k must be at least 1 and at max S.getRowDimension()
+        if(k < 1 || k > S.getRowDimension()) {
+            logger.severe("k must at least be 1 but must not be bigger than S.getRowDimension()");
+            throw new ArithmeticException("k must at least be 1 but must not be bigger than S.getRowDimension()");
+        }
+
+        try {
+            // Step 1: Reduce dimensionality of Matrix S by k
+            double[][] reducedS = new double[k][k];
+            for(int row = 0; row < k; row++) {
+                for(int col = 0; col < k; col++) {
+                    reducedS[row][col] = S.getArray()[row][col];
+                }
+            }
+
+            // Step 2: Reduce column dimensionality of Matrix T by k
+            double[][] reducedT = new double[T.getRowDimension()][k];
+            for(int row = 0; row < T.getRowDimension(); row++) {
+                for(int col = 0; col < k - 1; col++) {
+                    reducedT[row][col] = T.getArray()[row][col];
+                }
+            }
+
+            // Step 3: Reduce row dimensionality of Matrix D by k
+            double[][] reducedD = new double[k][D.getRowDimension()];
+            for(int row = 0; row < k - 1; row++) {
+                for(int col = 0; col < D.getColumnDimension(); col++) {
+                    reducedD[row][col] = D.getArray()[row][col];
+                }
+            }
+
+            Matrix temp = new Matrix(reducedT).times(new Matrix(reducedS));
+            return temp.times(new Matrix(reducedD));
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            logger.severe(Arrays.toString(e.getStackTrace()));
+            throw new RuntimeException(e);
+        }
 
     }
 

@@ -9,10 +9,7 @@ import Util.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -111,18 +108,35 @@ public class SearchEngine {
         // https://stackoverflow.com/a/39819177/10765169
         // TODO: We only get highest index atm
 
-        double max = Arrays.stream(cosineResult).max().orElse(-1);
-        int index = 0;
+        // Get all indexes higher than 0
+        HashMap<Integer, Double> indexes = new HashMap<>();
         for(int i = 0; i < cosineResult.length; i++) {
-            if(cosineResult[i] == max) {
-                index = i;
+            if(cosineResult[i] > 0) {
+                indexes.put(i, cosineResult[i]);
+            }
+        }
+
+        // Sort them, highest on top
+        LinkedHashMap<Integer, Double> linkedHashMap = new LinkedHashMap<>();
+        indexes.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> linkedHashMap.put(x.getKey(), x.getValue()));
+
+        // Get highest 10 indexes
+        ArrayList<WARCModel> returnList = new ArrayList<>();
+        int count = 0;
+        for(Integer index : linkedHashMap.keySet()) {
+            count ++;
+            returnList.add(models[index]);
+            if(count == 10) {
                 break;
             }
         }
 
+
         // Match index with models
-        ArrayList<WARCModel> returnList = new ArrayList<>();
-        returnList.add(this.models[index]);
+
         return returnList;
 
         // Dummy object

@@ -43,21 +43,40 @@ public class SandBox {
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
 
         // Create document-term-matrix
-        performanceTimer.start("loadBagOfWords");
-        Matrix documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
-        performanceTimer.stop("loadBagOfWords");
+//        performanceTimer.start("loadBagOfWords");
+//        Matrix documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+//        performanceTimer.stop("loadBagOfWords");
+//
+//        performanceTimer.start("createSVD");
+//        SingularValueDecomposition svd = documentTermMatrix.svd();
+//        performanceTimer.stop("createSVD");
+//
+//        performanceTimer.start("writeSVDComponents");
+//        matrixManager.writeMatrix(svd.getV(), "svd_v_" + splitter);
+//        matrixManager.writeMatrix(svd.getU(), "svd_u_" + splitter);
+//        matrixManager.writeMatrix(svd.getS(), "svd_s_" + splitter);
+//        performanceTimer.stop("writeSVDComponents");
+//        performanceTimer.logStatements();
+//        System.out.println("debug");
 
-        performanceTimer.start("createSVD");
-        SingularValueDecomposition svd = documentTermMatrix.svd();
-        performanceTimer.stop("createSVD");
+//        Matrix U = matrixManager.loadMatrix("svd_u_" + splitter);
+//        Matrix S = matrixManager.loadMatrix("svd_s_" + splitter);
+//        Matrix V = matrixManager.loadMatrix("svd_v_" + splitter);
+//
+//        performanceTimer.start("performLSA_" + splitter);
+//        Matrix LSA = matrixManager.performLatentSemanticIndexing(U, S, V, 800);
+//        performanceTimer.stop("performLSA_" + splitter);
+//
+//        performanceTimer.start("writeLSA" + splitter);
+//        matrixManager.writeMatrix(LSA, "LSA_" + splitter);
+//        performanceTimer.stop("writeLSA" + splitter);
+//
+//        performanceTimer.logStatements();
 
-        performanceTimer.start("writeSVDComponents");
-        matrixManager.writeMatrix(svd.getV(), "svd_v");
-        matrixManager.writeMatrix(svd.getU(), "svd_u");
-        matrixManager.writeMatrix(svd.getS(), "svd_s");
-        performanceTimer.stop("writeSVDComponents");
-        performanceTimer.logStatements();
+        Matrix dmt = matrixManager.loadMatrix("matrix_" + splitter);
+        Matrix lsa = matrixManager.loadMatrix("LSA_" + splitter);
         System.out.println("debug");
+
         System.exit(1);
 
     }

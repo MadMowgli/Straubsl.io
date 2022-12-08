@@ -92,7 +92,9 @@ public class Driver {
         logger.info("Global term set written to disk");
 
         // Create document-term-matrix
+        performanceTimer.start("createTxDMatrix");
         Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_chunk, termSet.getUniqueTerms());
+        performanceTimer.stop("createTxDMatrix");
 
         // Write matrix
         matrixManager.writeMatrix(documentTermMatrix, "matrix_" + splitter);
@@ -104,9 +106,9 @@ public class Driver {
 //        performanceTimer.stop("createSVD");
 //
 //        // Write SVD
-//        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v");
-//        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u");
-//        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s");
+//        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v_24");
+//        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u_24");
+//        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s_24");
         performanceTimer.logStatements();
         logger.info("Preprocessing done.");
 
