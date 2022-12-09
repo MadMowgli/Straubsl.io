@@ -189,7 +189,7 @@ public class MatrixManager {
         }
 
         // Step 3: Divide dot-product of each vector by dot-product of each normalized vector
-        return dotProduct / normalizedDotProduct;
+        return Double.isNaN(dotProduct / normalizedDotProduct) ? 0 :  dotProduct / normalizedDotProduct;
 
     }
 

@@ -59,8 +59,8 @@ public class SearchEngine {
 
         // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-//        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
-        this.documentTermMatrix = matrixManager.loadMatrix("LSA_" + splitter);
+        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+//        this.documentTermMatrix = matrixManager.loadMatrix("LSA_" + splitter);
         performanceTimer.stop("loadMatrix");
 
         // Normalize matrix - we don't need this since we normalize the vectors on the fly
