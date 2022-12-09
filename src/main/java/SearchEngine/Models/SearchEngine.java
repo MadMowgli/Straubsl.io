@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 public class SearchEngine {
 
     // ------------------------------------------------------------------------------------------------- CONSTANTS
-    public static final String LOGGER_NAME = "SpringSearch";
+    public static final String LOGGER_NAME = "SearchEngine";
     public static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
     public static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
     private final StringCleaner stringCleaner;
@@ -59,7 +59,8 @@ public class SearchEngine {
 
         // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+//        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+        this.documentTermMatrix = matrixManager.loadMatrix("LSA_" + splitter);
         performanceTimer.stop("loadMatrix");
 
         // Normalize matrix - we don't need this since we normalize the vectors on the fly
@@ -88,6 +89,7 @@ public class SearchEngine {
         // Clean query
         query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
 
+        // Transform the search query into a "document" by counting how many times each word of the term set appears in the query
         double[] frequencyVector = new double[this.documentTermMatrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
         String[] termSetArray = this.termSet.getUniqueTermsAsArray();
@@ -95,11 +97,10 @@ public class SearchEngine {
         for(int i = 0; i < this.documentTermMatrix.getRowDimension(); i++) {
             frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
         }
-        // double[] searchVector = matrixManager.normalizeVector(frequencyVector);
+
         this.performanceTimer.stop("transformQuery");
 
-        // Perform vector search
-        // TODO: I think we're messing up during the multiplication?
+        // Perform the cosine-similarity operation between the query-vector and each document in the matrix to obtain the documents which are the closest to the query
         this.performanceTimer.start("cosineSearch");
         double[] cosineResult = matrixManager.getCosineSimilarity(frequencyVector, documentTermMatrix);
         this.performanceTimer.stop("cosineSearch");

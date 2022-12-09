@@ -1,12 +1,9 @@
 package SandBox;
 
 import Jama.Matrix;
-import Jama.SingularValueDecomposition;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.TermSet;
-import PreProcessor.Models.WARCModel;
 import PreProcessor.Models.WETReader;
-import PreProcessor.Runnables.LocalUniquesRunnable;
 import Util.LogFormatter;
 import Util.MatrixManager;
 import Util.PerformanceTimer;
@@ -14,8 +11,6 @@ import Util.WARCModelManager;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;

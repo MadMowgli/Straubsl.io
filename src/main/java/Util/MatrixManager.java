@@ -65,10 +65,21 @@ public class MatrixManager {
             return (Matrix) objectInputStream.readObject();
         } catch (Exception e) {
             this.logger.severe(e.getMessage());
+            logger.severe(Arrays.toString(e.getStackTrace()));
         }
         return null;
 
     }
+
+    // ----------------------------------------------------------------------------------------------- Util
+    public double[] getColumn(Matrix m, int column) {
+        return m.getMatrix(0, m.getRowDimension() - 1, column, column).getColumnPackedCopy();
+    }
+
+    public double[] getRow(Matrix m, int row) {
+        return m.getMatrix(row, row, 0, m.getColumnDimension() - 1).getRowPackedCopy();
+    }
+
 
     // ----------------------------------------------------------------------------------------------- Maths
     public Matrix createDocumentTermMatrix(WARCModel[] documents, ArrayList<String> uniqueTerms) {
@@ -182,6 +193,14 @@ public class MatrixManager {
 
     }
 
+    /**
+     * Performs a cosine-similarity check between the given vector and matrix, such that the vector gets compared with
+     * each column (or each row, depending on fitting dimensionality) of the provided matrix.
+     * @param vector The input vector that needs to get checked on cosine-similarity on the matrix.
+     * @param matrix The input matrix that needs to get checked on cosine-similarity with the input vector.
+     * @return A vector such that each element represents the cosine-similarity of the input vector and each col/row of the input matrix.
+     * That is, outputArray[x] represents the cosine similarity between the whole inputArray and the inputMatrix[x][]
+     */
     public double[] getCosineSimilarity(double[] vector, Matrix matrix) {
 
         // Step 0: Vector must have the same number of elements as either matrix_m or matrix_n
@@ -190,31 +209,39 @@ public class MatrixManager {
             throw new ArithmeticException("Vector A must have the same number of elements as matrix.getRowDimension() or matrix.getColDimension()!");
         }
 
-        double[] returnVector = new double[matrix.getColumnDimension()];
-
         try {
             // Step 1: Calculate cosine-similarity of each col/row (depending on size)
             if(vector.length == matrix.getColumnDimension()) {
-                // In this case, we can work with row-vectors -> no need to transpose the matrix first
-                for(int i = 0; i < matrix.getColumnDimension() - 1; i ++) {
-                    returnVector[i] = this.getCosineSimilarity(vector, matrix.getArray()[i]);
+
+                // Calculate the cosine similarity between given vector and each row
+                double[] returnVector = new double[matrix.getRowDimension()];
+                for(int row = 0; row < matrix.getRowDimension(); row ++) {
+                    returnVector[row] = this.getCosineSimilarity(vector, this.getRow(matrix, row));
                 }
+                return returnVector;
             }
 
             if(vector.length == matrix.getRowDimension()) {
-                // Here we first need to transpose the matrix, since we can't access the column vectors directly via array
-                Matrix transpose = matrix.transpose();
-                for(int i = 0; i < transpose.getColumnDimension() - 1; i++) {
-                    returnVector[i] = this.getCosineSimilarity(vector, transpose.getArray()[i]);
+
+                // Calculate the cosine similarity between given vector and each column
+                double[] returnVector = new double[matrix.getColumnDimension()];
+                for(int col = 0; col < matrix.getColumnDimension(); col ++) {
+                    returnVector[col] = this.getCosineSimilarity(vector, this.getColumn(matrix, col));
+                    // TODO: this.getColumn() is returning an element and not a vector
                 }
+
+                return returnVector;
             }
+
         } catch (Exception e) {
             logger.severe(e.getMessage());
+            logger.severe(Arrays.toString(e.getStackTrace()));
+            throw new RuntimeException(e);
         }
 
 
         // The highest number in the returned vector is the index of the document the query corresponds the most with
-        return returnVector;
+        return null;
 
     }
 
