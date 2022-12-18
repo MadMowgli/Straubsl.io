@@ -182,4 +182,17 @@ public class WETReader {
         return warcModels.toArray(new WARCModel[0]);
     }
 
+    public WARCModel[] filterHttpsOnly(WARCModel[] models) {
+
+        ArrayList<WARCModel> returnList = new ArrayList<>();
+        for(WARCModel model : models) {
+            if(model.getTargetUri().startsWith("https")) {
+                returnList.add(model);
+            }
+        }
+
+        return returnList.toArray(new WARCModel[0]);
+
+    }
+
 }

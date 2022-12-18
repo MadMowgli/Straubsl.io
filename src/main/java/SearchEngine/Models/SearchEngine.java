@@ -14,8 +14,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SearchEngine {
 
@@ -33,6 +31,9 @@ public class SearchEngine {
     private MatrixManager matrixManager;
 
     private Matrix documentTermMatrix;
+    private Matrix termConceptMatrix;
+    private Matrix documentConceptMatrix;
+    private Matrix singularValues;
     private WETReader wetReader;
     private WARCModel[] models;
 
@@ -54,26 +55,25 @@ public class SearchEngine {
 
         // Read unique terms from preprocessed file
         performanceTimer.start("loadTermSet");
-        termSet.readGlobaltermSet("termset_" + splitter);
+        termSet.readGlobaltermSet("termset_eur_https" + splitter);
         performanceTimer.stop("loadTermSet");
 
         // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-        this.documentTermMatrix = matrixManager.loadMatrix("matrix_" + splitter);
+        this.documentTermMatrix = matrixManager.loadMatrix("matrix_eur_https" + splitter);
 //        this.documentTermMatrix = matrixManager.loadMatrix("LSA_" + splitter);
         performanceTimer.stop("loadMatrix");
 
-        // Normalize matrix - we don't need this since we normalize the vectors on the fly
-        // TODO: Maybe normalize it beforehand? Gives a performance boost...
-//        this.performanceTimer.start("normalizeMatrix");
-//        this.normalizedMatrix = matrixManager.normalizeVectors(this.matrix);
-//        this.matrixManager.writeMatrix(this.normalizedMatrix, "normalizedMatrix");
-//        this.performanceTimer.start("normalizeMatrix");
+        // Load SVD matrices
+        this.termConceptMatrix = matrixManager.loadMatrix("svd_u_" + splitter);
+        this.documentConceptMatrix = matrixManager.loadMatrix("svd_v_" + splitter);
+        this.singularValues = matrixManager.loadMatrix("svd_s_" + splitter);
+
 
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
-        this.models = modelManager.loadModels("models_" + splitter);
+        this.models = modelManager.loadModels("models_eur_https" + splitter);
         performanceTimer.stop("loadWarcModels");
         logger.info("Number of total Models: " + this.models.length);
 
@@ -85,19 +85,9 @@ public class SearchEngine {
     // ------------------------------------------------------------------------------------------------- METHODS
     public ArrayList<WARCModel> search(SearchQuery query) {
 
-        this.performanceTimer.start("transformQuery");
-        // Clean query
-        query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
-
         // Transform the search query into a "document" by counting how many times each word of the term set appears in the query
-        double[] frequencyVector = new double[this.documentTermMatrix.getRowDimension()];
-        ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
-        String[] termSetArray = this.termSet.getUniqueTermsAsArray();
-
-        for(int i = 0; i < this.documentTermMatrix.getRowDimension(); i++) {
-            frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
-        }
-
+        this.performanceTimer.start("transformQuery");
+        double[] frequencyVector = this.transformQueryToVector(query);
         this.performanceTimer.stop("transformQuery");
 
         // Perform the cosine-similarity operation between the query-vector and each document in the matrix to obtain the documents which are the closest to the query
@@ -145,6 +135,50 @@ public class SearchEngine {
 
     }
 
+    public ArrayList<WARCModel> performLSASearch(SearchQuery query) {
+
+        // Step 0: Create a query-vector by counting how many times each word of the term set appears in the query
+        this.performanceTimer.start("transformQuery");
+        double[] frequencyVector = this.transformQueryToVector(query);
+        this.performanceTimer.stop("transformQuery");
+
+        // Step 1: Find the concepts of the term-concept matrix that correspond with the query by multiplying the query vector with the term-concept matrix
+        Matrix queryMatrix = new Matrix(frequencyVector, 1);
+        Matrix queryConceptMatrix = queryMatrix.times(this.termConceptMatrix);
+
+        // Step 2: Find the documents of the document-concept matrix that correspond with the concepts of step 1 by using cosine similarity
+        double[] cosineSimilarities = matrixManager.getCosineSimilarity(queryConceptMatrix.getArray()[0], documentConceptMatrix);
+
+        // Step 3: Sort these documents so that the documents with the strongest concept-match is on top
+        Index index = new Index(cosineSimilarities);
+
+        // Step 4: Form ArrayList of WARCModels according to the topTenMap
+        ArrayList<WARCModel> returnList = new ArrayList<WARCModel>();
+        for(int i = 1; i < 11; i++) {
+            returnList.add(models[index.getItems().get(i).getIndex()]);
+        }
+
+        return returnList;
+
+    }
+
+    public double[] transformQueryToVector(SearchQuery query) {
+        this.performanceTimer.start("transformQuery");
+        // Clean query
+        query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
+
+        // Transform the search query into a "document" by counting how many times each word of the term set appears in the query
+        double[] frequencyVector = new double[this.documentTermMatrix.getRowDimension()];
+        ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
+        String[] termSetArray = this.termSet.getUniqueTermsAsArray();
+
+        for(int i = 0; i < this.documentTermMatrix.getRowDimension(); i++) {
+            frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
+        }
+
+        this.performanceTimer.stop("transformQuery");
+        return frequencyVector;
+    }
 
 
     public void configureLogger() {

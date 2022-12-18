@@ -33,7 +33,7 @@ public class MappingController {
 
         // Grab the search query & pass it to the search engine to transform into vector
         model.addAttribute("query", query);
-        ArrayList<WARCModel> warcModels = searchEngine.search(query);
+        ArrayList<WARCModel> warcModels = searchEngine.performLSASearch(query);
         model.addAttribute("warcModels", warcModels);
 
         return "result";

@@ -47,4 +47,9 @@
 ## 04.12.2022
 - Filtering out stop-words
   - The SVD-matrices get "destracted" from stop-words atm. Building in a function that filters out the stop-words will help.
-    To do so, 
+    
+
+## 17.12.2022
+- Filtering out http-Sites
+  - The current implementation of the VSM / LSA doesn't really bring back satisfying search results. While the VSM approach
+    returns documents that are at least relevant to the query, the LSA approach does return seemingly random documents.

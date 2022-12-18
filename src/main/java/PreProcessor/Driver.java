@@ -30,7 +30,7 @@ public class Driver {
     public static final String LOGGER_NAME = "PreProcessor";
     private static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
     private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
-    // private static final String WET_FILE_PATH = "data/TestData";
+    // private static final String WET_FILE_PATH = "data/TestData.wet";
 
     // Main method
     public static void main(String[] args) {
@@ -52,27 +52,22 @@ public class Driver {
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         String[] cont = wetReader.readLines(WET_FILE_PATH);
-        WARCModel[] models_eur = wetReader.toEurModelArray(cont);
+        WARCModel[] models_eur_https = wetReader.filterHttpsOnly(wetReader.toEurModelArray(cont));
         performanceTimer.stop("loadWarcModels");
-        logger.info("Number of total Models: " + models_eur.length);
+        logger.info("Number of total Models: " + models_eur_https.length);
 
         // We have to split our model-array to avoid OutOfMemoryError when creating Matrix
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
-        WARCModel[] models_chunk = Arrays.copyOfRange(models_eur, 0, models_eur.length/splitter);
+        WARCModel[] models_chunk = Arrays.copyOfRange(models_eur_https, 0, models_eur_https.length/splitter);
         logger.info("Number of Models in chunk: " + models_chunk.length);
 
         // Write chunk to disk
         performanceTimer.start("serializeModels");
-        modelManager.serializeModels(models_chunk, "models_" + splitter);
+        modelManager.serializeModels(models_chunk, "models_eur_https" + splitter);
         performanceTimer.stop("serializeModels");
         logger.info("Model-Chunk written to disk.");
 
-
-        // Unload content from RAM
-        cont = null;
-        models_eur = null;
-
-        // Step 1: Get all the unique terms from the models_eur ("local" uniques)
+        // Step 1: Get all the unique terms from the models_eur_https ("local" uniques)
         performanceTimer.start("getLocalUniques");
         try(ExecutorService executorService = Executors.newFixedThreadPool(Integer.parseInt( (String) configurationManager.properties.get("MaxThreads.LocalUniques")))) {
             for(WARCModel model : models_chunk) {
@@ -88,7 +83,7 @@ public class Driver {
         logger.info("Number of unique terms: " + termSet.getUniqueTerms().size());
 
         // Save the global TermSet
-        termSet.writeGlobalTermSet("termset_" + splitter);
+        termSet.writeGlobalTermSet("termset_eur_https" + splitter);
         logger.info("Global term set written to disk");
 
         // Create document-term-matrix
@@ -97,18 +92,18 @@ public class Driver {
         performanceTimer.stop("createTxDMatrix");
 
         // Write matrix
-        matrixManager.writeMatrix(documentTermMatrix, "matrix_" + splitter);
+        matrixManager.writeMatrix(documentTermMatrix, "matrix_eur_https" + splitter);
         logger.info("Global term set written to disk");
 
         // Create SVD matrix
-//        performanceTimer.start("createSVD");
-//        SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
-//        performanceTimer.stop("createSVD");
-//
-//        // Write SVD
-//        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v_24");
-//        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u_24");
-//        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s_24");
+        performanceTimer.start("createSVD");
+        SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(documentTermMatrix);
+        performanceTimer.stop("createSVD");
+
+        // Write SVD
+        matrixManager.writeMatrix(singularValueDecomposition.getV(), "svd_v_" + splitter);
+        matrixManager.writeMatrix(singularValueDecomposition.getU(), "svd_u_" + splitter);
+        matrixManager.writeMatrix(singularValueDecomposition.getS(), "svd_s_" + splitter);
         performanceTimer.logStatements();
         logger.info("Preprocessing done.");
 

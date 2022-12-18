@@ -211,15 +211,15 @@ public class MatrixManager {
 
         try {
             // Step 1: Calculate cosine-similarity of each col/row (depending on size)
-            if(vector.length == matrix.getColumnDimension()) {
-
-                // Calculate the cosine similarity between given vector and each row
-                double[] returnVector = new double[matrix.getRowDimension()];
-                for(int row = 0; row < matrix.getRowDimension(); row ++) {
-                    returnVector[row] = this.getCosineSimilarity(vector, this.getRow(matrix, row));
-                }
-                return returnVector;
-            }
+//            if(vector.length == matrix.getColumnDimension()) {
+//
+//                // Calculate the cosine similarity between given vector and each row
+//                double[] returnVector = new double[matrix.getRowDimension()];
+//                for(int row = 0; row < matrix.getRowDimension(); row ++) {
+//                    returnVector[row] = this.getCosineSimilarity(vector, this.getRow(matrix, row));
+//                }
+//                return returnVector;
+//            }
 
             if(vector.length == matrix.getRowDimension()) {
 
@@ -227,7 +227,6 @@ public class MatrixManager {
                 double[] returnVector = new double[matrix.getColumnDimension()];
                 for(int col = 0; col < matrix.getColumnDimension(); col ++) {
                     returnVector[col] = this.getCosineSimilarity(vector, this.getColumn(matrix, col));
-                    // TODO: this.getColumn() is returning an element and not a vector
                 }
 
                 return returnVector;

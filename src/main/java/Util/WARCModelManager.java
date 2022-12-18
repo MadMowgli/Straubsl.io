@@ -52,7 +52,6 @@ public class WARCModelManager {
         }
     }
 
-    // TODO: Implement method to load serialized models
     public WARCModel[] loadModels(String fileName) {
 
         // Load models from file
