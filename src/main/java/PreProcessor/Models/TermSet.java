@@ -4,6 +4,7 @@ import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Driver;
 import PreProcessor.Runnables.FilterChunkRunnable;
 import Util.PerformanceTimer;
+import org.springframework.util.ResourceUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -226,10 +227,10 @@ public class TermSet {
     public void readGlobaltermSet(String name) {
 
         // Construct filename
-        String dirName = System.getProperty("user.dir") + this.configManager.properties.getProperty("Files.Path.TermSet");
-        String fileName = dirName + name + ".txt";
+//        String dirName = System.getProperty("user.dir") + this.configManager.properties.getProperty("Files.Path.TermSet");
+        String fileName = name + ".txt";
 
-        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(ResourceUtils.getFile("classpath:models/" + fileName)))) {
             this.uniqueTerms.addAll(bufferedReader.lines().toList());
         } catch (Exception e) {
             this.logger.severe(e.getMessage());

@@ -1,6 +1,7 @@
 package Util;
 
 import PreProcessor.Configuration.ConfigurationManager;
+import org.springframework.util.ResourceUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,7 +19,8 @@ public class StringCleaner {
         // Read stop-words from file
         this.stopWords = new ArrayList<>();
         try (BufferedReader bufferedReader = new BufferedReader(
-                new FileReader(configurationManager.properties.getProperty("Files.Path.StopWords")))) {
+//                new FileReader(configurationManager.properties.getProperty("Files.Path.StopWords")))) {
+                new FileReader(ResourceUtils.getFile("classpath:stopwords.txt")))) {
             String line = "";
             while((line = bufferedReader.readLine()) != null) {
                 this.stopWords.add(line);

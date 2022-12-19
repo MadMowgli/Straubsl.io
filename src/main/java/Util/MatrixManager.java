@@ -4,6 +4,7 @@ import Jama.Matrix;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Driver;
 import PreProcessor.Models.WARCModel;
+import org.springframework.util.ResourceUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,7 +62,7 @@ public class MatrixManager {
         String filePath = dirPath + name;
         // String filePath = dirPath + "Matrix.txt";
 
-        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(ResourceUtils.getFile("classpath:models/" + name)))) {
             return (Matrix) objectInputStream.readObject();
         } catch (Exception e) {
             this.logger.severe(e.getMessage());

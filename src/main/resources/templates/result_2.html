@@ -30,14 +30,14 @@
   </div>
   <div class="row">
     <div class="col-9">
-      <table class="table table-hover table-borderless">
-        <tr th:each="result: ${warcModels}">
-          <td><a th:href="@{${result.getTargetUri()}}" th:text="${result.getTargetUri()}"></a></td>
-        </tr>
-      </table>
-    </div>
-    <div class="col-3">
-      <p class="text-center" th:text="${query.getQueryString()}"></p>
+      <div class="card text-dark bg-light mb-3" th:each="result: ${warcModels}">
+        <div class="card-header">Header</div>
+        <div class="card-body">
+          <h5 class="card-title">Card Title</h5>
+          <h6 class="card-subtitle mb-2 text-muted"><a th:href="@{${result.getTargetUri()}}" th:text="${result.getTargetUri()}"></a></h6>
+          <p th:text="${result.getContent().get(0)}"></p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -3,6 +3,7 @@ package Util;
 import Jama.Matrix;
 import PreProcessor.Configuration.ConfigurationManager;
 import PreProcessor.Models.WARCModel;
+import org.springframework.util.ResourceUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -58,7 +59,7 @@ public class WARCModelManager {
         String dirPath = System.getProperty("user.dir") + (String) configManager.properties.getProperty("Files.Path.Models");
         String filePath = dirPath + fileName;
 
-        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(ResourceUtils.getFile("classpath:models/" + fileName)))) {
             return (WARCModel[]) objectInputStream.readObject();
         } catch (Exception e) {
             this.logger.severe(e.getMessage());

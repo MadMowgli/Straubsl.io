@@ -1,7 +1,6 @@
 package SearchEngine.Controllers;
 
 import PreProcessor.Models.WARCModel;
-import SearchEngine.Models.SearchEngineDummy;
 import SearchEngine.Models.SearchQuery;
 import SearchEngine.Models.SearchEngine;
 import org.springframework.stereotype.Controller;

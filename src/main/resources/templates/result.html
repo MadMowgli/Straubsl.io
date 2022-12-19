@@ -1,48 +1,55 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns="http://www.w3.org/1999/html">
-
-
+      xmlns="http://www.w3.org/1999/html" lang="en">
 <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>SpringSearch</title>
     <link href="/bootstrap.min.css" rel="stylesheet">
     <link href="/custom.css" rel="stylesheet">
 </head>
 
 <body>
+<div class="container mt-5">
 
-<div class="container">
-  <div class="row my-5 sticky-top">
-    <nav class="navbar navbar-light sticky-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          <img src="/PngItem_2528255.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
-          Straubsl.io
-        </a>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
-    </nav>
-  </div>
-  <div class="row">
-    <div class="col-9">
-      <div class="card text-dark bg-light mb-3" th:each="result: ${warcModels}">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Card Title</h5>
-          <h6 class="card-subtitle mb-2 text-muted"><a th:href="@{${result.getTargetUri()}}" th:text="${result.getTargetUri()}"></a></h6>
-          <p th:text="${result.getContent().get(0)}"></p>
-        </div>
-      </div>
+    <div class="row my-5 sticky-top">
+        <nav class="navbar navbar-light sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img src="/PngItem_2528255.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                    Straubsl.io
+                </a>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
     </div>
-  </div>
-</div>
-<script src="/bootstrap.bundle.min.js"></script>
-<script src="/result.js"></script>
-</body>
+    <hr>
+    <h2>Results</h2>
 
+    <div class="row" th:each="result: ${warcModels}">
+        <div class="col-md-8">
+            <h4><a th:href="@{${result.getTargetUri()}}" th:text="${result.getTargetUri()}">Result 1</a></h4>
+            <p th:text="${result.getDate()}"></p>
+        </div>
+
+</div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.16.6/dist/umd/popper.min.js"
+        integrity="sha384-8C1Z9YVfQGQ+BJgD8wKwJ0vb+cG0A/x7RJZR9X1RH4c4tL+VF8uJWKGMV7S5S5B"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+</body>
 </html>
