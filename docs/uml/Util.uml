@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>Util</OriginalElement>
+  <nodes>
+    <node x="262.21886446886424" y="131.63736263736257">Util.WARCModelManager</node>
+    <node x="-125.0" y="-182.0">Util.PerformanceTimer</node>
+    <node x="262.21886446886424" y="342.0">Util.LogFormatter</node>
+    <node x="262.21886446886424" y="-80.08608058608061">Util.StringCleaner</node>
+    <node x="-209.0" y="78.0">Util.MatrixManager</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Util.MatrixManager" target="Util.PerformanceTimer" relationship="CREATE">
+      <point x="0.0" y="-182.0" />
+      <point x="0.0" y="105.0" />
+    </edge>
+    <edge source="Util.MatrixManager" target="Util.PerformanceTimer" relationship="TO_ONE">
+      <point x="41.898769230769176" y="-182.30016117216118" />
+      <point x="41.898769230769176" y="52.84991941391941" />
+      <point x="41.898769230769176" y="27.876424908424895" />
+      <point x="41.898769230769176" y="104.8764249084249" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="true" x="196.5" y="130.0000000000001" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
