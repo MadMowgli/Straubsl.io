@@ -66,10 +66,6 @@ public class SearchEngine {
         this.documentConceptMatrix = matrixManager.loadMatrix("svd_v_" + splitter);
         performanceTimer.stop("loadMatrix");
 
-
-
-
-
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
@@ -94,10 +90,6 @@ public class SearchEngine {
         this.performanceTimer.start("cosineSearch");
         double[] cosineResult = matrixManager.getCosineSimilarity(frequencyVector, documentTermMatrix);
         this.performanceTimer.stop("cosineSearch");
-
-        // Get indices (corresponds to documents) with highest value
-        // https://stackoverflow.com/a/39819177/10765169
-        // TODO: We only get highest index atm
 
         // Get all indexes higher than 0
         HashMap<Integer, Double> indexes = new HashMap<>();
@@ -125,13 +117,7 @@ public class SearchEngine {
             }
         }
 
-
-        // Match index with models
-
         return returnList;
-
-        // Dummy object
-        // return new ArrayList<WARCModel>(Arrays.asList(this.models).subList(0, 10));
 
     }
 

@@ -83,7 +83,7 @@ public class MatrixManager {
 
 
     // ----------------------------------------------------------------------------------------------- Maths
-    public Matrix createDocumentTermMatrix(WARCModel[] documents, ArrayList<String> uniqueTerms) {
+    public Matrix createTermDocumentMatrix(WARCModel[] documents, ArrayList<String> uniqueTerms) {
         performanceTimer.start("createMatrixArray");
 
         /* Create document-term-matrix

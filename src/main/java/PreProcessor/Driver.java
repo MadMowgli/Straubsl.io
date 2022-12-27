@@ -14,9 +14,7 @@ import Util.WARCModelManager;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
@@ -88,7 +86,7 @@ public class Driver {
 
         // Create document-term-matrix
         performanceTimer.start("createTxDMatrix");
-        Matrix documentTermMatrix = matrixManager.createDocumentTermMatrix(models_chunk, termSet.getUniqueTerms());
+        Matrix documentTermMatrix = matrixManager.createTermDocumentMatrix(models_chunk, termSet.getUniqueTerms());
         performanceTimer.stop("createTxDMatrix");
 
         // Write matrix
