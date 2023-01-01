@@ -42,15 +42,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>Jama</groupId>
-            <artifactId>Jama</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/Jama-1.0.3.jar</systemPath>
-        </dependency>
-
-
     </dependencies>
 
     <build>
@@ -58,24 +49,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <mainClass>SearchEngine.SpringSearchApplication</mainClass>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-                <targetPath>${project.build.outputDirectory}</targetPath>
-                <includes>
-                    <include>application.properties</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
 </project>

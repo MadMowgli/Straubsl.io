@@ -20,6 +20,7 @@ public class SearchEngine {
     // ------------------------------------------------------------------------------------------------- CONSTANTS
     public static final String LOGGER_NAME = "SearchEngine";
     public static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
+    public static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
     private final StringCleaner stringCleaner;
 
     // ------------------------------------------------------------------------------------------------- FIELDS
@@ -32,7 +33,8 @@ public class SearchEngine {
     private Matrix documentTermMatrix;
     private Matrix termConceptMatrix;
     private Matrix documentConceptMatrix;
-
+    private Matrix singularValues;
+    private WETReader wetReader;
     private WARCModel[] models;
 
     // ------------------------------------------------------------------------------------------------- CONSTRUCTOR
@@ -47,34 +49,36 @@ public class SearchEngine {
         this.performanceTimer = new PerformanceTimer();
         this.termSet = new TermSet(configurationManager);
         this.matrixManager = new MatrixManager(configurationManager);
-
+        this.wetReader = new WETReader(configurationManager);
         this.stringCleaner = new StringCleaner(configurationManager);
         int splitter = Integer.parseInt((String) configurationManager.properties.get("Data.Splitter"));
 
         // Read unique terms from preprocessed file
         performanceTimer.start("loadTermSet");
-        termSet.readGlobaltermSet("termset_eur_https_" + splitter);
+        termSet.readGlobaltermSet("termset_eur_https" + splitter);
         performanceTimer.stop("loadTermSet");
 
         // Load normalized Matrix
         performanceTimer.start("loadMatrix");
-//        this.documentTermMatrix = matrixManager.loadMatrix("matrix_eur_https" + splitter);
+        this.documentTermMatrix = matrixManager.loadMatrix("matrix_eur_https" + splitter);
 //        this.documentTermMatrix = matrixManager.loadMatrix("LSA_" + splitter);
+        performanceTimer.stop("loadMatrix");
 
         // Load SVD matrices
         this.termConceptMatrix = matrixManager.loadMatrix("svd_u_" + splitter);
         this.documentConceptMatrix = matrixManager.loadMatrix("svd_v_" + splitter);
-        performanceTimer.stop("loadMatrix");
+        this.singularValues = matrixManager.loadMatrix("svd_s_" + splitter);
+
 
         // Read input & convert each WARC-section to an object
         performanceTimer.start("loadWarcModels");
         WARCModelManager modelManager = new WARCModelManager(configurationManager, logger);
-        this.models = modelManager.loadModels("models_eur_https_" + splitter);
+        this.models = modelManager.loadModels("models_eur_https" + splitter);
         performanceTimer.stop("loadWarcModels");
         logger.info("Number of total Models: " + this.models.length);
 
         // Check initialization
-        this.logger.info("SearchEngine initialized");
+        this.logger.info("SearchEngine initialized - " + documentTermMatrix.getRowDimension() + "x" + documentTermMatrix.getColumnDimension());
 
     }
 
@@ -90,6 +94,10 @@ public class SearchEngine {
         this.performanceTimer.start("cosineSearch");
         double[] cosineResult = matrixManager.getCosineSimilarity(frequencyVector, documentTermMatrix);
         this.performanceTimer.stop("cosineSearch");
+
+        // Get indices (corresponds to documents) with highest value
+        // https://stackoverflow.com/a/39819177/10765169
+        // TODO: We only get highest index atm
 
         // Get all indexes higher than 0
         HashMap<Integer, Double> indexes = new HashMap<>();
@@ -117,7 +125,13 @@ public class SearchEngine {
             }
         }
 
+
+        // Match index with models
+
         return returnList;
+
+        // Dummy object
+        // return new ArrayList<WARCModel>(Arrays.asList(this.models).subList(0, 10));
 
     }
 
@@ -154,11 +168,11 @@ public class SearchEngine {
         query.setQueryString(stringCleaner.cleanString(query.getQueryString()));
 
         // Transform the search query into a "document" by counting how many times each word of the term set appears in the query
-        double[] frequencyVector = new double[this.termConceptMatrix.getRowDimension()];
+        double[] frequencyVector = new double[this.documentTermMatrix.getRowDimension()];
         ArrayList<String> queryArray = new ArrayList<>(Arrays.asList(query.getQueryString().split(" ")));
         String[] termSetArray = this.termSet.getUniqueTermsAsArray();
 
-        for(int i = 0; i < this.termConceptMatrix.getRowDimension(); i++) {
+        for(int i = 0; i < this.documentTermMatrix.getRowDimension(); i++) {
             frequencyVector[i] = Collections.frequency(queryArray, termSetArray[i]);
         }
 
