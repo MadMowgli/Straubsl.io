@@ -16,31 +16,24 @@
 <div class="container">
   <div class="row my-5 sticky-top">
     <nav class="navbar navbar-light sticky-top">
-      <div class="container-fluid">
         <a class="navbar-brand" href="/">
-          <img src="/PngItem_2528255.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
-          Straubsl.io
+            <img src="/PngItem_2528255.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+            Straubsl.io
         </a>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
     </nav>
   </div>
   <div class="row">
     <div class="col-9">
       <div class="card text-dark bg-light mb-3" th:each="result: ${warcModels}">
-        <div class="card-header">Header</div>
         <div class="card-body">
-          <h5 class="card-title">Card Title</h5>
+          <h5 class="card-title"><p th:text="${result.getContent().get(0)}"></p></h5>
           <h6 class="card-subtitle mb-2 text-muted"><a th:href="@{${result.getTargetUri()}}" th:text="${result.getTargetUri()}"></a></h6>
-          <p th:text="${result.getContent().get(0)}"></p>
         </div>
       </div>
     </div>
   </div>
 </div>
+<script src="/jquery.min.js"></script>
 <script src="/bootstrap.bundle.min.js"></script>
 <script src="/result.js"></script>
 </body>
