@@ -4,6 +4,9 @@
  
 Table of contents
 ===================
+* [How to use](#how-to-use)
+  * [How to start the engine](#how-to-start-the-engine)
+  * [How to use CommonCrawl data](#how-to-use-commoncrawl-data)
 * [Packages](#packages)
   * [PreProcessor](#preprocessor)
   * [SearchEngine](#searchengine)
@@ -43,3 +46,8 @@ Table of contents
 > The main purpose of the Util package is to provide classes that contain shared functionality.
 
 ![Util UML Diagram](docs/uml/png/Util.png)
+
+
+Why the name[^1]?
+
+[^1]: Straubsl is based on a nickname of the developer and was suggested by a friend of him 
