@@ -48,6 +48,7 @@ Table of contents
 ![Util UML Diagram](docs/uml/png/Util.png)
 
 
-Why the name[^1]?
+### Why the name?
+> [^1]
 
-[^1]: Straubsl is based on a nickname of the developer and was suggested by a friend of him 
+[^1]: 'Straubsl' is based on a nickname of the developer and was suggested by a friend of him 
