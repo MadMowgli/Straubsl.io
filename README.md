@@ -15,6 +15,7 @@ Table of contents
 1. Clone this project
 2. Add lib/Jama-1.0.3.jar as project library
 3. Run `src/main/java/SearchEngine/SpringSearchApplication.java` as SpringBoot application
+4. Visit http://localhost:8080/
 
 ## How to use CommonCrawl data
 1. Choose which main crawl to download from CommonCrawl: https://data.commoncrawl.org/crawl-data/index.html
