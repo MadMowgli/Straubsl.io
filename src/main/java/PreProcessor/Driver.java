@@ -27,8 +27,8 @@ public class Driver {
     // Fields
     public static final String LOGGER_NAME = "PreProcessor";
     private static final String LOGGER_PATH = System.getProperty("user.dir") + "/Logs/";
-    private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
-    // private static final String WET_FILE_PATH = "data/TestData.wet";
+//    private static final String WET_FILE_PATH = "data/CC-MAIN-20220924151538-20220924181538-00000.warc.wet";
+     private static final String WET_FILE_PATH = "data/TestData.wet";
 
     // Main method
     public static void main(String[] args) {

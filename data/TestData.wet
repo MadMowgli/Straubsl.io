@@ -1,6 +1,6 @@
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Dog
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
@@ -20,7 +20,7 @@ Over the millennia, dogs became uniquely adapted to human behavior, and the huma
 
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Cat
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
@@ -51,7 +51,7 @@ As of 2021, there were an estimated 220 million owned and 480 million stray cats
 
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Birds
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
@@ -89,7 +89,7 @@ Recreational birdwatching is an important part of the ecotourism industry.
 
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Computer
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
@@ -121,7 +121,7 @@ Peripheral devices allow information to be retrieved from an external source and
 
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Matrix
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
@@ -147,7 +147,7 @@ Matrices are used in most areas of mathematics and most scientific fields, eithe
 
 WARC/1.0
 WARC-Type: conversion
-WARC-Target-URI: http://009417.com/Product/829610
+WARC-Target-URI: https://en.wikipedia.org/wiki/Search_engine
 WARC-Date: 2022-09-24T17:03:44Z
 WARC-Record-ID: <urn:uuid:5bac213d-28e0-4249-870f-4f02fb8cbe19>
 WARC-Refers-To: <urn:uuid:99c992b0-3fb7-429c-af44-e4fbe25bffee>
